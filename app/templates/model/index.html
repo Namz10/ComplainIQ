@@ -1,1 +1,37 @@
-{% extends 'base.html' %}{% block content %}<h1>Model information</h1><p>Urgency is a transparent heuristic, not an ML prediction.</p><img class="img-fluid" src="{{url_for('static',filename='../docs/confusion_matrix.png')}}" alt="Confusion matrix"><form method="post"><textarea class="form-control my-2" name="text" minlength="20" required></textarea><button class="btn btn-primary">Classify</button></form>{% if result %}<pre>{{result}}</pre>{% endif %}{% endblock %}
+{% extends 'base.html' %}
+{% block title %}AI model · ComplainIQ{% endblock %}
+{% block section %}AI model{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">AI-ASSISTED TRIAGE</p><h1>Model workspace</h1><p>Try the complaint classification flow and understand how the signals are used.</p></div></div>
+<div class="row g-3">
+  <div class="col-lg-7">
+    <section class="form-panel h-100">
+      <div class="panel-heading"><div><h2>Test a complaint</h2><p>Enter a sample message to see its predicted category and triage signals.</p></div></div>
+      <form method="post">
+        <label class="form-label" for="text">Complaint text</label>
+        <textarea class="form-control" id="text" name="text" minlength="20" rows="7" placeholder="Write at least 20 characters describing a customer concern." required></textarea>
+        <div class="form-hint">Use non-sensitive demo text. Do not enter real customer information.</div>
+        <button class="btn btn-primary mt-3">Classify text&nbsp; →</button>
+      </form>
+      {% if result %}
+        <hr class="my-4">
+        <div class="panel-heading"><div><h2>Classification result</h2><p>Automated result for review, not a final decision.</p></div></div>
+        <pre class="result-output">{{ result }}</pre>
+      {% endif %}
+    </section>
+  </div>
+  <div class="col-lg-5">
+    <section class="panel mb-3">
+      <div class="panel-heading"><div><h2>How triage works</h2><p>Signals support the team; they do not replace staff judgment.</p></div></div>
+      <div class="d-flex gap-3 mb-3"><span class="user-avatar flex-shrink-0">1</span><div><div class="fw-semibold small">Category</div><div class="text-secondary small mt-1">A trained classifier is used when available; otherwise keyword-based fallback rules apply.</div></div></div>
+      <div class="d-flex gap-3 mb-3"><span class="user-avatar flex-shrink-0">2</span><div><div class="fw-semibold small">Sentiment</div><div class="text-secondary small mt-1">VADER estimates the tone of the submitted text.</div></div></div>
+      <div class="d-flex gap-3"><span class="user-avatar flex-shrink-0">3</span><div><div class="fw-semibold small">Urgency</div><div class="text-secondary small mt-1">Urgency is assigned using documented rule-of-thumb checks, not an ML prediction.</div></div></div>
+    </section>
+    <section class="panel mb-3">
+      <div class="panel-heading"><div><h2>Model evaluation</h2><p>Confusion matrix from the trained model evaluation.</p></div></div>
+      <img class="img-fluid rounded border" src="{{ url_for('static', filename='images/confusion_matrix.png') }}" alt="Confusion matrix showing model classification results">
+    </section>
+    <div class="info-strip">Training metrics depend on the dataset used. Metadata-derived results should not be interpreted as real-world complaint narrative accuracy.</div>
+  </div>
+</div>
+{% endblock %}

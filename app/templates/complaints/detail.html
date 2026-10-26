@@ -1,1 +1,73 @@
-{% extends 'base.html' %}{% block content %}<h1>Complaint #{{complaint.complaint_id}}</h1><p>{{complaint.complaint_text}}</p><form method="post" class="card card-body"><select class="form-select mb-2" name="status">{% for s in ['OPEN','IN_REVIEW','RESOLVED','REJECTED'] %}<option {% if complaint.status==s %}selected{% endif %}>{{s}}</option>{% endfor %}</select><select class="form-select mb-2" name="category_id">{% for c in categories %}<option value="{{c.category_id}}" {% if complaint.category_id==c.category_id %}selected{% endif %}>{{c.name}}</option>{% endfor %}</select><textarea class="form-control mb-2" name="note" placeholder="Note"></textarea><button class="btn btn-primary">Update</button></form><h2 class="h4 mt-3">Audit trail</h2>{% for a in actions %}<p>{{a.acted_at}} — {{a.action}}: {{a.note}}</p>{% endfor %}{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Case #{{ complaint.complaint_id }} · ComplainIQ{% endblock %}
+{% block section %}<a href="{{ url_for('complaints.index') }}">Complaints</a> <span>/</span> Case #{{ complaint.complaint_id }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">COMPLAINT REVIEW</p>
+    <h1>Case #{{ complaint.complaint_id }}</h1>
+    <p>Submitted {{ complaint.submitted_at }}{% if complaint.customer_name %} by {{ complaint.customer_name }}{% endif %}</p>
+  </div>
+  <a class="btn btn-outline-primary" href="{{ url_for('complaints.index') }}">←&nbsp; Back to complaints</a>
+</div>
+<div class="row g-3">
+  <div class="col-lg-7">
+    <section class="panel mb-3">
+      <div class="panel-heading"><div><h2>Customer message</h2><p>Original complaint text</p></div><span class="status-badge status-{{ (complaint.status or 'open')|lower }}">{{ (complaint.status or 'OPEN')|replace('_', ' ') }}</span></div>
+      <div class="detail-text">{{ complaint.complaint_text }}</div>
+    </section>
+    <section class="panel">
+      <div class="panel-heading"><div><h2>Review history</h2><p>Recorded case actions and notes</p></div></div>
+      {% for a in actions %}
+        <div class="d-flex gap-3 border-bottom py-3">
+          <span class="user-avatar flex-shrink-0">·</span>
+          <div><div class="fw-semibold small">{{ a.action|replace('_', ' ')|title }}</div><div class="text-secondary small mt-1">{{ a.note or 'No additional note' }}</div><div class="text-secondary mt-1" style="font-size:10px">{{ a.acted_at }}</div></div>
+        </div>
+      {% else %}
+        <p class="text-secondary small mb-0">No review actions have been recorded yet.</p>
+      {% endfor %}
+    </section>
+  </div>
+  <div class="col-lg-5">
+    <section class="panel mb-3">
+      <div class="panel-heading"><div><h2>Case context</h2><p>Account and automated triage details</p></div></div>
+      <div class="data-list">
+        <div class="data-item"><small>Customer</small><strong>{{ complaint.customer_name or '—' }}</strong></div>
+        <div class="data-item"><small>Account</small><strong>{{ complaint.account_number or '—' }}</strong></div>
+        <div class="data-item"><small>Category</small><strong>{{ complaint.category_name or 'Unclassified' }}</strong></div>
+        <div class="data-item"><small>Urgency</small><strong>{{ complaint.urgency or 'Not set' }}</strong></div>
+        <div class="data-item"><small>Sentiment</small><strong>{{ complaint.sentiment_label or 'Not assessed' }}</strong></div>
+        <div class="data-item"><small>Confidence</small><strong>{% if complaint.confidence is not none %}{{ '%.0f'|format(complaint.confidence * 100) }}%{% else %}—{% endif %}</strong></div>
+        <div class="data-item"><small>Transaction amount</small><strong>{% if complaint.txn_amount is not none %}{{ '%.2f'|format(complaint.txn_amount) }}{% else %}—{% endif %}</strong></div>
+      </div>
+      {% if flags %}
+        <hr>
+        <h3 class="h6 fw-bold mb-3">Related fraud flags</h3>
+        {% for f in flags %}<div class="d-flex justify-content-between gap-2 mb-2"><span class="small">{{ f.reason }}</span><span class="severity-badge severity-{{ f.severity|lower }}">{{ f.severity }}</span></div>{% endfor %}
+      {% endif %}
+    </section>
+    <section class="form-panel">
+      <div class="panel-heading"><div><h2>Update case</h2><p>Save a status, category, or review note.</p></div></div>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label" for="status">Case status</label>
+          <select class="form-select" id="status" name="status">
+            {% for s in ['OPEN','IN_REVIEW','RESOLVED','REJECTED'] %}<option {% if complaint.status==s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="category_id">Category</label>
+          <select class="form-select" id="category_id" name="category_id">
+            {% for c in categories %}<option value="{{ c.category_id }}" {% if complaint.category_id==c.category_id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="note">Review note</label>
+          <textarea class="form-control" id="note" name="note" rows="3" placeholder="Add a note for the case history"></textarea>
+        </div>
+        <button class="btn btn-primary w-100">Save case update</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

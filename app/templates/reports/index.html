@@ -1,1 +1,43 @@
-{% extends 'base.html' %}{% block content %}<h1>Reports</h1><h2 class="h4">Top customers by complaints</h2><table class="table"><tr><th>Name</th><th>Count</th></tr>{% for r in top %}<tr><td>{{r.full_name}}</td><td>{{r.count}}</td></tr>{% endfor %}</table><h2 class="h4">Recent flags</h2><table class="table"><tr><th>Reason</th><th>Customer</th></tr>{% for f in flags %}<tr><td>{{f.reason}}</td><td>{{f.customer_name}}</td></tr>{% endfor %}</table>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Reports · ComplainIQ{% endblock %}
+{% block section %}Reports{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">OPERATIONAL INSIGHTS</p><h1>Reports</h1><p>Explore complaint activity and recent risk signals from the current records.</p></div></div>
+<div class="row g-3">
+  <div class="col-xl-5">
+    <section class="panel h-100">
+      <div class="panel-heading"><div><h2>Customers with most complaints</h2><p>Highest case counts in the available records.</p></div></div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>#</th><th>Customer</th><th>Complaints</th></tr></thead>
+          <tbody>
+            {% for r in top %}
+              <tr><td class="text-secondary">{{ loop.index }}</td><td class="fw-semibold">{{ r.full_name }}</td><td><span class="status-badge status-pending">{{ r.count }}</span></td></tr>
+            {% else %}
+              <tr><td class="table-empty" colspan="3">No complaint totals to report yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <div class="col-xl-7">
+    <section class="panel h-100">
+      <div class="panel-heading"><div><h2>Recent fraud signals</h2><p>Latest flags, including signals already reviewed.</p></div></div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>Reason</th><th>Customer</th><th>Amount</th><th>Severity</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for f in flags %}
+              <tr><td class="fw-semibold">{{ f.reason }}</td><td>{{ f.customer_name }}</td><td>{{ '%.2f'|format(f.amount) }}</td><td><span class="severity-badge severity-{{ f.severity|lower }}">{{ f.severity }}</span></td><td><span class="status-badge status-{{ f.status|lower }}">{{ f.status }}</span></td></tr>
+            {% else %}
+              <tr><td class="table-empty" colspan="5">No fraud flags have been recorded.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="info-strip mt-3">Reports summarize the records available in this demo application; they are not a separate data warehouse or live analytics feed.</div>
+{% endblock %}

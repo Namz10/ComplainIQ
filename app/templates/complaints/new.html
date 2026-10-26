@@ -1,1 +1,38 @@
-{% extends 'base.html' %}{% block content %}<div class="row justify-content-center"><div class="col-lg-8"><p class="eyebrow">CUSTOMER PORTAL · AI TRIAGE</p><h1 class="h2">Tell us what happened</h1><p class="text-secondary">Your complaint is classified for the review team using text analysis, sentiment and an urgency score.</p><form method="post" class="panel mt-4"><div class="row g-3"><div class="col-md-6"><label class="form-label">Registered email</label><input class="form-control" name="email" type="email" required></div><div class="col-md-6"><label class="form-label">Account number</label><input class="form-control" name="account_number" required></div><div class="col-12"><label class="form-label">Transaction ID <span class="text-secondary">(optional)</span></label><input class="form-control" name="txn_id" type="number" min="1" placeholder="For example, 1042"></div><div class="col-12"><label class="form-label">Complaint details</label><textarea class="form-control" name="complaint_text" rows="7" minlength="20" placeholder="Describe the transaction or service problem in at least 20 characters." required></textarea></div></div><button class="btn btn-primary mt-4">Submit for classification</button></form></div></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Submit a complaint · ComplainIQ{% endblock %}
+{% block section %}Customer support{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-xl-9">
+    <div class="page-heading">
+      <div><p class="eyebrow">CUSTOMER SUPPORT</p><h1>Tell us what happened</h1><p>Share the details so the review team can understand and route your concern.</p></div>
+    </div>
+    <div class="info-strip mb-3"><strong>What happens next?</strong> Your complaint is categorized to help the team prioritize it. A staff member reviews the case; automated labels are not a final decision.</div>
+    <form method="post" class="form-panel">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="email">Registered email</label>
+          <input class="form-control" id="email" name="email" type="email" autocomplete="email" placeholder="name@example.com" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="account_number">Account number</label>
+          <input class="form-control" id="account_number" name="account_number" placeholder="Enter the account number" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="txn_id">Transaction ID <span class="text-secondary fw-normal">(optional)</span></label>
+          <input class="form-control" id="txn_id" name="txn_id" type="number" min="1" placeholder="Add this if your concern is about a specific transaction">
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="complaint_text">Complaint details</label>
+          <textarea class="form-control" id="complaint_text" name="complaint_text" rows="7" minlength="20" placeholder="Describe what happened, including any relevant dates or transaction details." required></textarea>
+          <div class="form-hint">Please enter at least 20 characters. Avoid including passwords or security codes.</div>
+        </div>
+      </div>
+      <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mt-4">
+        <span class="small text-secondary">Your information is used to identify the related account and case.</span>
+        <button class="btn btn-primary">Submit complaint&nbsp; →</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,1 +1,32 @@
-{% extends 'base.html' %}{% block content %}<h1>Pending fraud flags</h1><table class="table bg-white"><tr><th>Reason</th><th>Severity</th><th>Customer</th><th>Amount</th><th></th></tr>{% for f in flags %}<tr><td>{{f.reason}}</td><td>{{f.severity}}</td><td>{{f.customer_name}}</td><td>{{f.amount}}</td><td><form class="d-inline" method="post" action="{{url_for('fraud.review',flag_id=f.flag_id,status='CONFIRMED')}}"><button class="btn btn-success btn-sm">Confirm</button></form> <form class="d-inline" method="post" action="{{url_for('fraud.review',flag_id=f.flag_id,status='DISMISSED')}}"><button class="btn btn-outline-secondary btn-sm">Dismiss</button></form></td></tr>{% else %}<tr><td colspan="5">No pending flags.</td></tr>{% endfor %}</table>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Fraud queue · ComplainIQ{% endblock %}
+{% block section %}Fraud queue{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">RISK REVIEW</p><h1>Fraud queue</h1><p>Review rule-based and complaint-linked signals. Flags are prompts for human review, not proof of fraud.</p></div></div>
+<div class="info-strip mb-3">Review the reason and transaction context before confirming or dismissing a flag.</div>
+<section class="table-card">
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Signal</th><th>Customer</th><th>Transaction</th><th>Merchant &amp; location</th><th>Severity</th><th>Created</th><th class="text-end">Review</th></tr></thead>
+      <tbody>
+        {% for f in flags %}
+          <tr>
+            <td><div class="fw-semibold">{{ f.reason }}</div><div class="text-secondary mt-1" style="font-size:10px">{{ f.source }} signal</div></td>
+            <td>{{ f.customer_name }}</td>
+            <td class="fw-semibold">{{ '%.2f'|format(f.amount) }}</td>
+            <td><div>{{ f.merchant or '—' }}</div><div class="text-secondary" style="font-size:10px">{{ f.location or 'Location unavailable' }}</div></td>
+            <td><span class="severity-badge severity-{{ f.severity|lower }}">{{ f.severity }}</span></td>
+            <td class="text-secondary">{{ f.created_at }}</td>
+            <td class="text-end text-nowrap">
+              <form class="d-inline" method="post" action="{{ url_for('fraud.review', flag_id=f.flag_id, status='CONFIRMED') }}"><button class="btn btn-sm btn-success">Confirm</button></form>
+              <form class="d-inline" method="post" action="{{ url_for('fraud.review', flag_id=f.flag_id, status='DISMISSED') }}"><button class="btn btn-sm btn-outline-secondary">Dismiss</button></form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td class="table-empty" colspan="7">There are no pending flags to review.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

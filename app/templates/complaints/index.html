@@ -1,1 +1,31 @@
-{% extends 'base.html' %}{% block content %}<div class="d-flex justify-content-between align-items-center mb-3"><div><p class="eyebrow">AI-ASSISTED CASE MANAGEMENT</p><h1 class="h3">Complaints</h1></div><a class="btn btn-primary" href="{{url_for('complaints.new')}}">New complaint</a></div><form class="panel row g-2 align-items-end mb-3" method="get"><div class="col-md"><label class="form-label small text-secondary">Case status</label><select class="form-select" name="status"><option value="">All statuses</option>{% for item in ['OPEN','IN_REVIEW','RESOLVED','REJECTED'] %}<option {% if filters.status==item %}selected{% endif %}>{{item}}</option>{% endfor %}</select></div><div class="col-md"><label class="form-label small text-secondary">AI category</label><select class="form-select" name="category_id"><option value="">All categories</option>{% for c in categories %}<option value="{{c.category_id}}" {% if filters.category_id|string==c.category_id|string %}selected{% endif %}>{{c.name}}</option>{% endfor %}</select></div><div class="col-md"><label class="form-label small text-secondary">Urgency</label><select class="form-select" name="urgency"><option value="">All urgency</option>{% for item in ['HIGH','MEDIUM','LOW'] %}<option {% if filters.urgency==item %}selected{% endif %}>{{item}}</option>{% endfor %}</select></div><div class="col-md"><label class="form-label small text-secondary">Sentiment</label><select class="form-select" name="sentiment"><option value="">All sentiment</option>{% for item in ['NEGATIVE','NEUTRAL','POSITIVE'] %}<option {% if filters.sentiment==item %}selected{% endif %}>{{item}}</option>{% endfor %}</select></div><div class="col-auto"><button class="btn btn-outline-light">Filter</button></div></form><div class="panel p-0 overflow-hidden"><div class="table-responsive"><table class="table table-darkish mb-0"><tr><th>CASE</th><th>CUSTOMER</th><th>AI CATEGORY</th><th>CONFIDENCE</th><th>URGENCY</th><th>SENTIMENT</th><th>STATUS</th></tr>{% for c in complaints %}<tr><td><a href="{{url_for('complaints.detail',complaint_id=c.complaint_id)}}">#{{c.complaint_id}}</a></td><td>{{c.customer_name}}</td><td>{{c.category_name}}</td><td>{{'%.0f'|format((c.confidence or 0)*100)}}%</td><td><span class="status-pill {{(c.urgency or 'LOW')|lower}}">{{c.urgency}}</span></td><td>{{c.sentiment_label}}</td><td>{{c.status}}</td></tr>{% else %}<tr><td colspan="7">No complaints match these filters.</td></tr>{% endfor %}</table></div></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Complaints · ComplainIQ{% endblock %}
+{% block section %}Complaints{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">CASE MANAGEMENT</p><h1>Complaints</h1><p>Review, prioritize, and manage submitted customer cases.</p></div>
+  <a class="btn btn-primary" href="{{ url_for('complaints.new') }}">＋&nbsp; New complaint</a>
+</div>
+<section class="table-card">
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Case</th><th>Customer</th><th>Category</th><th>Urgency</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
+      <tbody>
+        {% for c in complaints %}
+          <tr>
+            <td><a class="fw-bold" href="{{ url_for('complaints.detail', complaint_id=c.complaint_id) }}">#{{ c.complaint_id }}</a></td>
+            <td class="fw-semibold">{{ c.customer_name }}</td>
+            <td>{{ c.category_name or 'Unclassified' }}</td>
+            <td><span class="severity-badge severity-{{ (c.urgency or 'low')|lower }}">{{ c.urgency or 'Not set' }}</span></td>
+            <td><span class="status-badge status-{{ (c.status or 'open')|lower }}">{{ (c.status or 'OPEN')|replace('_', ' ') }}</span></td>
+            <td class="text-secondary">{{ c.submitted_at }}</td>
+            <td><a class="btn btn-sm btn-outline-primary" href="{{ url_for('complaints.detail', complaint_id=c.complaint_id) }}">Review</a></td>
+          </tr>
+        {% else %}
+          <tr><td class="table-empty" colspan="7">No complaints have been submitted yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

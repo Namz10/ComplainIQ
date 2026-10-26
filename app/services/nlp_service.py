@@ -59,8 +59,6 @@ def predict(text, txn_amount=None, model_path=None):
         best = probabilities.argmax()
         category, confidence = classes[best], float(probabilities[best])
     except FileNotFoundError:
-        # A deterministic fallback keeps the demo usable before a CFPB model is trained.
-        # The trained TF-IDF model automatically takes precedence once present.
         lowered = text.lower()
         rules = (
             (FRAUD_CATEGORY, ("unauthorized", "fraud", "scam", "stolen", "not my", "identity theft")),

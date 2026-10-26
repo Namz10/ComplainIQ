@@ -1,1 +1,11 @@
-{% extends 'base.html' %}{% block title %}Page not found{% endblock %}{% block content %}<h1>Page not found</h1><p>The requested page does not exist.</p>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Page not found · ComplainIQ{% endblock %}
+{% block section %}Not found{% endblock %}
+{% block content %}
+<section class="panel text-center py-5 my-4">
+  <p class="eyebrow">404 · PAGE NOT FOUND</p>
+  <h1 class="h2 fw-bold">We couldn’t find that page.</h1>
+  <p class="text-secondary mb-4">The link may be outdated, or the address may have been entered incorrectly.</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Return to overview</a>
+</section>
+{% endblock %}

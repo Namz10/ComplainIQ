@@ -1,8 +1,67 @@
 {% extends 'base.html' %}
+{% block title %}Overview · ComplainIQ{% endblock %}
+{% block section %}Overview{% endblock %}
 {% block content %}
-<section class="hero-panel mb-4"><div><p class="eyebrow">OPERATIONS OVERVIEW</p><h1>Complaint intelligence,<br><span>made explainable.</span></h1><p class="text-secondary mb-0">A single view of customer cases, transaction risk and AI-assisted classification.</p></div><a class="btn btn-primary" href="{{ url_for('complaints.new') }}">File a complaint</a></section>
-<div class="row g-3 mb-4"><div class="col-md-6 col-xl-3"><div class="metric-card"><span>Open cases</span><strong>{{ stats.open_count }}</strong><small>Needs staff review</small></div></div><div class="col-md-6 col-xl-3"><div class="metric-card danger"><span>High urgency</span><strong>{{ stats.high_urgency }}</strong><small>Priority intervention</small></div></div><div class="col-md-6 col-xl-3"><div class="metric-card warning"><span>Pending fraud flags</span><strong>{{ stats.flags }}</strong><small>Rule or NLP signals</small></div></div><div class="col-md-6 col-xl-3"><div class="metric-card"><span>Transactions tracked</span><strong>{{ stats.transactions }}</strong><small>DBMS transaction ledger</small></div></div></div>
-<div class="row g-3"><div class="col-lg-7"><div class="panel h-100"><div class="panel-title"><div><p class="eyebrow">AI + NLP</p><h2>Complaint trend</h2></div><span class="badge-soft">Monthly</span></div><canvas id="trendChart" height="130"></canvas></div></div><div class="col-lg-5"><div class="panel h-100"><div class="panel-title"><div><p class="eyebrow">CLASSIFICATION</p><h2>Category distribution</h2></div></div><canvas id="categoryChart" height="130"></canvas></div></div><div class="col-lg-7"><div class="panel"><div class="panel-title"><div><p class="eyebrow">DBMS RECORDS</p><h2>Recent complaint activity</h2></div><a href="{{ url_for('complaints.index') }}">View all</a></div><div class="table-responsive"><table class="table table-darkish mb-0"><tr><th>CASE</th><th>CUSTOMER</th><th>AI CATEGORY</th><th>PRIORITY</th></tr>{% for c in recent %}<tr><td><a href="{{ url_for('complaints.detail', complaint_id=c.complaint_id) }}">#{{ c.complaint_id }}</a></td><td>{{ c.customer_name }}</td><td>{{ c.category_name or 'Pending' }}</td><td><span class="status-pill {{ (c.urgency or 'LOW')|lower }}">{{ c.urgency or 'LOW' }}</span></td></tr>{% else %}<tr><td colspan="4" class="text-secondary">No complaints recorded yet.</td></tr>{% endfor %}</table></div></div></div><div class="col-lg-5"><div class="panel h-100"><div class="panel-title"><div><p class="eyebrow">SENTIMENT</p><h2>Customer tone</h2></div></div><canvas id="sentimentChart" height="155"></canvas><p class="small text-secondary mt-3 mb-0">VADER sentiment is stored alongside each complaint for staff triage.</p></div></div></div>
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">OPERATIONS OVERVIEW</p>
+    <h1>Good work starts with clarity.</h1>
+    <p>Review customer concerns and possible risk signals from one place.</p>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('complaints.new') }}">＋&nbsp; Submit a complaint</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-4">
+    <div class="metric-card">
+      <span class="metric-label">Open complaints</span>
+      <strong class="metric-value">{{ open_count }}</strong>
+      <div class="metric-note">Cases that still need attention</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-4">
+    <div class="metric-card metric-red">
+      <span class="metric-label">Pending fraud flags</span>
+      <strong class="metric-value">{{ flags }}</strong>
+      <div class="metric-note">Signals awaiting staff review</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-4">
+    <div class="metric-card metric-blue">
+      <span class="metric-label">Complaint categories</span>
+      <strong class="metric-value">{{ categories|length }}</strong>
+      <div class="metric-note">Topics used to organize cases</div>
+    </div>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-heading">
+    <div>
+      <h2>Complaint category overview</h2>
+      <p>Volume and high-urgency share across recorded cases.</p>
+    </div>
+    {% if session.get('role') %}<a class="btn btn-sm btn-outline-primary" href="{{ url_for('complaints.index') }}">View complaints&nbsp; →</a>{% endif %}
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Category</th><th>Cases</th><th>Average sentiment</th><th>High urgency</th></tr></thead>
+      <tbody>
+        {% for c in categories %}
+          <tr>
+            <td class="fw-semibold">{{ c.category_name }}</td>
+            <td>{{ c.complaint_count }}</td>
+            <td>{% if c.avg_sentiment is not none %}{{ '%.2f'|format(c.avg_sentiment) }}{% else %}<span class="text-secondary">—</span>{% endif %}</td>
+            <td><span class="status-badge {% if c.high_urgency_percent >= 50 %}status-disputed{% else %}status-active{% endif %}">{{ '%.1f'|format(c.high_urgency_percent) }}%</span></td>
+          </tr>
+        {% else %}
+          <tr><td class="table-empty" colspan="4">No category data is available yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+<div class="info-strip mt-3">AI-assisted categories and urgency are triage signals. Staff should review the complaint before making a decision.</div>
 {% endblock %}
 {% block scripts %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>
 const axis={ticks:{color:'#94a3b8'},grid:{color:'rgba(148,163,184,.12)'}};

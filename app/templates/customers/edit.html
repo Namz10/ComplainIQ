@@ -1,1 +1,15 @@
-{% extends 'base.html' %}{% block content %}<h1>Edit customer</h1><form method="post" class="card card-body col-md-6"><input class="form-control mb-2" name="full_name" value="{{customer.full_name}}" required><input class="form-control mb-2" name="email" type="email" value="{{customer.email}}" required><input class="form-control mb-2" name="phone" value="{{customer.phone or ''}}"><input class="form-control mb-3" name="city" value="{{customer.city or ''}}"><button class="btn btn-primary">Save</button></form>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Edit customer · ComplainIQ{% endblock %}
+{% block section %}<a href="{{ url_for('customers.index') }}">Customers</a> <span>/</span> Edit{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">CUSTOMER RECORDS</p><h1>Edit customer</h1><p>Update contact details for {{ customer.full_name }}.</p></div><a class="btn btn-outline-primary" href="{{ url_for('customers.index') }}">←&nbsp; Back to customers</a></div>
+<form method="post" class="form-panel" style="max-width:760px">
+  <div class="row g-3">
+    <div class="col-md-6"><label class="form-label" for="full_name">Full name</label><input class="form-control" id="full_name" name="full_name" value="{{ customer.full_name }}" required></div>
+    <div class="col-md-6"><label class="form-label" for="email">Email</label><input class="form-control" id="email" name="email" type="email" value="{{ customer.email }}" required></div>
+    <div class="col-md-6"><label class="form-label" for="phone">Phone</label><input class="form-control" id="phone" name="phone" value="{{ customer.phone or '' }}"></div>
+    <div class="col-md-6"><label class="form-label" for="city">City</label><input class="form-control" id="city" name="city" value="{{ customer.city or '' }}"></div>
+  </div>
+  <div class="d-flex gap-2 mt-4"><button class="btn btn-primary">Save changes</button><a class="btn btn-outline-secondary" href="{{ url_for('customers.index') }}">Cancel</a></div>
+</form>
+{% endblock %}

@@ -1,1 +1,48 @@
-{% extends 'base.html' %}{% block content %}<p class="eyebrow">DBMS · TRANSACTION LEDGER</p><h1 class="h3 mb-3">Transactions</h1><form method="post" class="card card-body row g-2 mb-4"><div class="col-md"><select class="form-select" name="account_id">{% for a in accounts %}<option value="{{a.account_id}}">{{a.account_number}}</option>{% endfor %}</select></div><div class="col-md-2"><select class="form-select" name="txn_type"><option>DEBIT</option><option>CREDIT</option></select></div><div class="col-md-2"><input class="form-control" type="number" step="0.01" min="0.01" name="amount" placeholder="Amount" required></div><div class="col-md"><input class="form-control" name="merchant" placeholder="Merchant"></div><div class="col-md"><input class="form-control" name="location" placeholder="Location"></div><div class="col-auto"><button class="btn btn-primary">Add</button></div></form><form class="panel row g-2 align-items-end mb-3" method="get"><div class="col-md"><label class="form-label small text-secondary">Account</label><select class="form-select" name="account_id"><option value="">All accounts</option>{% for a in accounts %}<option value="{{a.account_id}}" {% if selected_account|string == a.account_id|string %}selected{% endif %}>{{a.account_number}}</option>{% endfor %}</select></div><div class="col-md"><label class="form-label small text-secondary">Status</label><select class="form-select" name="status"><option value="">All statuses</option>{% for s in ['COMPLETED','DISPUTED','REVERSED'] %}<option {% if selected_status==s %}selected{% endif %}>{{s}}</option>{% endfor %}</select></div><div class="col-md"><label class="form-label small text-secondary">Type</label><select class="form-select" name="txn_type"><option value="">All types</option>{% for t in ['DEBIT','CREDIT'] %}<option {% if selected_type==t %}selected{% endif %}>{{t}}</option>{% endfor %}</select></div><div class="col-md"><label class="form-label small text-secondary">From</label><input class="form-control" type="date" name="date_from" value="{{date_from}}"></div><div class="col-md"><label class="form-label small text-secondary">To</label><input class="form-control" type="date" name="date_to" value="{{date_to}}"></div><div class="col-auto"><button class="btn btn-outline-light">Filter</button></div></form><div class="panel p-0 overflow-hidden"><div class="table-responsive"><table class="table table-darkish mb-0"><tr><th>TIME</th><th>ACCOUNT</th><th>TYPE</th><th>AMOUNT</th><th>MERCHANT</th><th>LOCATION</th><th>STATUS</th></tr>{% for t in transactions %}<tr><td>{{t.txn_time}}</td><td>{{t.account_number}}</td><td>{{t.txn_type}}</td><td>₹ {{'%.2f'|format(t.amount)}}</td><td>{{t.merchant or '—'}}</td><td>{{t.location or '—'}}</td><td>{{t.status}}</td></tr>{% else %}<tr><td colspan="7">No transactions match these filters.</td></tr>{% endfor %}</table></div></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Transactions · ComplainIQ{% endblock %}
+{% block section %}Transactions{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">TRANSACTION LEDGER</p><h1>Transactions</h1><p>Review account activity and add transactions for the demo environment.</p></div></div>
+<section class="form-panel mb-3">
+  <div class="panel-heading"><div><h2>Record a transaction</h2><p>New debits are checked against the configured demonstration risk rules.</p></div></div>
+  <form method="post" class="row g-3 align-items-end">
+    <div class="col-lg-3 col-md-6"><label class="form-label" for="account_id">Account</label><select class="form-select" id="account_id" name="account_id">{% for a in accounts %}<option value="{{ a.account_id }}">{{ a.account_number }}</option>{% endfor %}</select></div>
+    <div class="col-lg-2 col-md-6"><label class="form-label" for="txn_type">Type</label><select class="form-select" id="txn_type" name="txn_type"><option>DEBIT</option><option>CREDIT</option></select></div>
+    <div class="col-lg-2 col-md-6"><label class="form-label" for="amount">Amount</label><input class="form-control" id="amount" type="number" step="0.01" min="0.01" name="amount" placeholder="0.00" required></div>
+    <div class="col-lg-2 col-md-6"><label class="form-label" for="merchant">Merchant</label><input class="form-control" id="merchant" name="merchant" placeholder="Merchant"></div>
+    <div class="col-lg-2 col-md-6"><label class="form-label" for="location">Location</label><input class="form-control" id="location" name="location" placeholder="City or region"></div>
+    <div class="col-lg-1 col-md-6"><button class="btn btn-primary w-100">Add</button></div>
+  </form>
+</section>
+<form method="get" class="filter-panel row g-2 align-items-end">
+  <div class="col-md-4">
+    <label class="form-label" for="account-filter">Account</label>
+    <select class="form-select" id="account-filter" name="account_id"><option value="">All accounts</option>{% for a in accounts %}<option value="{{ a.account_id }}" {% if selected_account|string == a.account_id|string %}selected{% endif %}>{{ a.account_number }}</option>{% endfor %}</select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label" for="status-filter">Status</label>
+    <select class="form-select" id="status-filter" name="status"><option value="">All statuses</option>{% for s in ['COMPLETED','DISPUTED','REVERSED'] %}<option value="{{ s }}" {% if selected_status==s %}selected{% endif %}>{{ s|title }}</option>{% endfor %}</select>
+  </div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Apply filters</button></div>
+  {% if selected_account or selected_status %}<div class="col-auto"><a class="btn btn-outline-secondary" href="{{ url_for('transactions.index') }}">Clear</a></div>{% endif %}
+</form>
+<section class="table-card">
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Date &amp; time</th><th>Account</th><th>Merchant</th><th>Type</th><th>Amount</th><th>Location</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for t in transactions %}
+          <tr>
+            <td class="text-secondary">{{ t.txn_time }}</td><td class="fw-semibold">{{ t.account_number }}</td><td>{{ t.merchant or '—' }}</td>
+            <td><span class="status-badge {% if t.txn_type=='CREDIT' %}status-active{% else %}status-disputed{% endif %}">{{ t.txn_type }}</span></td>
+            <td class="fw-semibold">{{ '%.2f'|format(t.amount) }}</td><td>{{ t.location or '—' }}</td>
+            <td><span class="status-badge status-{{ (t.status or 'completed')|lower }}">{{ t.status }}</span></td>
+          </tr>
+        {% else %}
+          <tr><td class="table-empty" colspan="7">No transactions match these filters.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

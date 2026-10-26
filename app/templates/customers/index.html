@@ -1,1 +1,41 @@
-{% extends 'base.html' %}{% block content %}<h1>Customers</h1><form class="row g-2 mb-3" method="get"><div class="col"><input class="form-control" name="q" value="{{term}}" placeholder="Search name or email"></div><div class="col-auto"><button class="btn btn-outline-primary">Search</button></div></form><form class="row g-2 card card-body mb-3" method="post"><div class="col"><input class="form-control" name="full_name" placeholder="Full name" required></div><div class="col"><input class="form-control" name="email" type="email" placeholder="Email" required></div><div class="col"><input class="form-control" name="phone" placeholder="Phone"></div><div class="col"><input class="form-control" name="city" placeholder="City"></div><div class="col-auto"><button class="btn btn-primary">Add</button></div></form><div class="table-responsive"><table class="table bg-white"><tr><th>Name</th><th>Email</th><th>City</th><th></th></tr>{% for c in customers %}<tr><td>{{c.full_name}}</td><td>{{c.email}}</td><td>{{c.city}}</td><td><a class="btn btn-sm btn-outline-primary" href="{{url_for('customers.edit',customer_id=c.customer_id)}}">Edit</a> <form class="d-inline" method="post" action="{{url_for('customers.delete',customer_id=c.customer_id)}}" onsubmit="return confirm('Delete customer?')"><button class="btn btn-sm btn-outline-danger">Delete</button></form></td></tr>{% else %}<tr><td colspan="4">No customers found.</td></tr>{% endfor %}</table></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Customers · ComplainIQ{% endblock %}
+{% block section %}Customers{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">CUSTOMER RECORDS</p><h1>Customers</h1><p>Maintain customer contact information and find existing records.</p></div></div>
+<section class="form-panel mb-3">
+  <div class="panel-heading"><div><h2>Add a customer</h2><p>Required fields are marked in the form.</p></div></div>
+  <form class="row g-3 align-items-end" method="post">
+    <div class="col-lg-3 col-md-6"><label class="form-label" for="full_name">Full name</label><input class="form-control" id="full_name" name="full_name" placeholder="Customer name" required></div>
+    <div class="col-lg-3 col-md-6"><label class="form-label" for="email">Email</label><input class="form-control" id="email" name="email" type="email" placeholder="name@example.com" required></div>
+    <div class="col-lg-2 col-md-6"><label class="form-label" for="phone">Phone</label><input class="form-control" id="phone" name="phone" placeholder="Phone number"></div>
+    <div class="col-lg-2 col-md-6"><label class="form-label" for="city">City</label><input class="form-control" id="city" name="city" placeholder="City"></div>
+    <div class="col-lg-2"><button class="btn btn-primary w-100">＋ Add customer</button></div>
+  </form>
+</section>
+<form class="filter-panel row g-2 align-items-center" method="get">
+  <div class="col-md-5"><label class="visually-hidden" for="customer-search">Search customers</label><input class="form-control" id="customer-search" name="q" value="{{ term }}" placeholder="Search by name or email"></div>
+  <div class="col-auto"><button class="btn btn-outline-primary">Search records</button></div>
+  {% if term %}<div class="col-auto"><a class="btn btn-outline-secondary" href="{{ url_for('customers.index') }}">Clear</a></div>{% endif %}
+</form>
+<section class="table-card">
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Customer</th><th>Email</th><th>City</th><th>Phone</th><th class="text-end">Actions</th></tr></thead>
+      <tbody>
+        {% for c in customers %}
+          <tr>
+            <td class="fw-semibold">{{ c.full_name }}</td><td>{{ c.email }}</td><td>{{ c.city or '—' }}</td><td>{{ c.phone or '—' }}</td>
+            <td class="text-end text-nowrap">
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('customers.edit', customer_id=c.customer_id) }}">Edit</a>
+              <form class="d-inline" method="post" action="{{ url_for('customers.delete', customer_id=c.customer_id) }}" onsubmit="return confirm('Delete customer?')"><button class="btn btn-sm btn-outline-danger">Delete</button></form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td class="table-empty" colspan="5">No matching customer records.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,1 +1,31 @@
-{% extends 'base.html' %}{% block content %}<div class="col-md-5 mx-auto card shadow-sm"><div class="card-body"><h1 class="h3">Staff login</h1><form method="post"><input class="form-control mb-2" name="username" placeholder="Username" required><input class="form-control mb-3" type="password" name="password" placeholder="Password" required><button class="btn btn-primary">Sign in</button></form></div></div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Staff sign in · ComplainIQ{% endblock %}
+{% block section %}Staff access{% endblock %}
+{% block content %}
+<div class="auth-layout">
+  <section class="auth-intro">
+    <p class="eyebrow">STAFF WORKSPACE</p>
+    <h1>Welcome back to a clearer way to review.</h1>
+    <p>Sign in to manage complaint cases, review risk signals, and access operational reports.</p>
+    <div class="info-strip mt-4">Customer complaint submission remains available without staff sign-in.</div>
+  </section>
+  <section class="auth-card">
+    <div class="mb-4">
+      <p class="eyebrow">SECURE ACCESS</p>
+      <h2>Staff sign in</h2>
+      <p class="text-secondary small mb-0">Use your assigned workspace credentials.</p>
+    </div>
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label" for="username">Username</label>
+        <input class="form-control" id="username" name="username" autocomplete="username" placeholder="Enter your username" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+      </div>
+      <button class="btn btn-primary w-100">Sign in to workspace&nbsp; →</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

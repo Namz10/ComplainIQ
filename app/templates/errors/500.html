@@ -1,1 +1,11 @@
-{% extends 'base.html' %}{% block title %}Server error{% endblock %}{% block content %}<h1>Something went wrong</h1><p>Please try again later.</p>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Something went wrong · ComplainIQ{% endblock %}
+{% block section %}Error{% endblock %}
+{% block content %}
+<section class="panel text-center py-5 my-4">
+  <p class="eyebrow">500 · SERVER ERROR</p>
+  <h1 class="h2 fw-bold">We couldn’t complete that request.</h1>
+  <p class="text-secondary mb-4">Please try again. If the problem continues, contact your workspace administrator.</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Return to overview</a>
+</section>
+{% endblock %}
